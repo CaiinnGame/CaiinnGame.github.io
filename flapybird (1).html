@@ -1,0 +1,343 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Bird Clone</title>
+
+  <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100&family=Lumanosimo&family=Montserrat:wght@100&family=Press+Start+2P&family=Roboto:wght@300&display=swap');
+/*font-family: 'Lato', sans-serif;
+font-family: 'Montserrat', sans-serif;
+font-family: 'Lumanosimo', cursive;
+font-family: 'Press Start 2P', cursive;
+font-family: 'Roboto', sans-serif;
+*/
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+   background: rgb(255,255,255);
+background: linear-gradient(348deg, rgba(255,255,255,0.8374575660342262) 10%, rgba(226,101,255,0.8717138740453827) 40%, rgba(94,80,211,1) 87%);
+}
+
+#game-container {
+  width:1400px;
+  height: 600px;
+ background: rgb(255,255,255);
+background: linear-gradient(348deg, rgba(255,255,255,0.8374575660342262) 10%, rgba(226,101,255,0.8717138740453827) 40%, rgba(94,80,211,1) 87%);
+  position: relative;
+}
+
+#bird {
+  border-radius: 20px;
+  width: 60px;
+  height: 60px;
+  background-image: url('cain.JPEG');
+  background-size: cover;
+  position: absolute;
+  left: 50px;
+  top: 250px;
+}
+
+.pipe {
+  width: 150px;
+  background-image: url('lean2.png');
+      background-size: cover; /* Ajusta a imagem para cobrir toda a div */
+      background-position: center; /* Centraliza a imagem */
+
+  position: absolute;
+  bottom: 0;
+}
+
+#start-button {
+  z-index: 10;
+  width: 120px;
+  height: 50px;
+  background-color: #FF5733;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  animation: floatAnimation 2s infinite;
+}
+
+.item {
+  width: 60px;
+  height: 60px;
+background-image: url('mac.png');
+  background-size: cover;
+  position: absolute;
+  top: 0;
+    animation: floatAnimation 2s infinite;
+}
+
+.score{
+  font-size: 30px;
+  position: relative;
+  top: 10px;
+  left: 20px;
+}
+.score{
+  font-family: 'Lumanosimo', cursive;
+  font-weight: bold;
+  color: green;
+      animation: floatAnimation 2s infinite;
+}
+
+.titulo{
+    animation: floatAnimation 2s infinite;
+  z-index: 90000;
+  font-family: 'Press Start 2P', cursive;
+  padding: 20px;
+  position: relative;
+  text-align: center;
+  color: #FF5733;
+  font-size: 30px;
+}
+
+
+
+@keyframes floatAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+</style>
+</head>
+<body>
+    
+
+
+  <div class="titulo" id="t"> CAIINN GAME </div>
+  
+
+  <button id="start-button">Start</button>
+
+  <div id="game-container">
+
+    <div class="score" id="score">
+      <p>Maconhas: 0</p>
+    </div>
+
+    <div id="bird"></div>
+    <div class="pipe" style="height: 200px; left: 500px;"></div>
+    <div class="pipe" style="height: 150px; left: 800px;"></div>
+    <div class="item" style="display: none;"></div>
+  </div>
+     
+<script>
+  const bird = document.getElementById('bird');
+  const startButton = document.getElementById('start-button');
+  const gameContainer = document.getElementById('game-container');
+  const pipes = document.querySelectorAll('.pipe');
+  const item = document.querySelector('.item');
+  const titulo = document.querySelector('.titulo');;
+
+  let birdPosition = 250;
+  let pipePosition = 400;
+  let itemPosition = 400; // Initial position for the item
+  let score = 0;
+  let itenscoletados = 0
+  let isGameRunning = false;
+
+  function jump() {
+    birdPosition -= 75;
+    bird.style.top = birdPosition + 'px';
+  }
+
+  function createPipe() {
+    const randomHeight = Math.floor(Math.random() * 300) + 150;
+    pipes.forEach(pipe => {
+      pipe.style.height = randomHeight + 'px';
+    });
+    pipePosition = 1400;
+  }
+
+  function createItem() {
+    itemPosition = 1400; // Starting position from the right side of the game container
+    const randomHeight = Math.floor(Math.random() * 300) + 150;
+    item.style.top = randomHeight + 'px';
+    item.style.left = itemPosition + 'px';
+    item.style.display = 'block';
+  }
+
+  function checkCollision() {
+    // Code for collision with pipes (same as before)...
+    
+
+  const birdLeft = bird.getBoundingClientRect().left;
+    const birdRight = bird.getBoundingClientRect().right;
+    const birdTop = bird.getBoundingClientRect().top;
+    const birdBottom = bird.getBoundingClientRect().bottom;
+
+    pipes.forEach(pipe => {
+      const pipeLeft = pipe.getBoundingClientRect().left;
+      const pipeRight = pipe.getBoundingClientRect().right;
+      const pipeTop = pipe.getBoundingClientRect().top;
+      const pipeBottom = pipe.getBoundingClientRect().bottom;
+
+      if (
+        birdLeft < pipeRight &&
+        birdRight > pipeLeft &&
+        birdTop < pipeBottom &&
+        birdBottom > pipeTop
+      ) {
+        // Bird collided with a pipe
+        alert('Game Over! Score: ' + score + ". Itens coletados: " + itenscoletados + " maconhas");
+        resetGame();
+      }
+    });
+
+
+
+
+    // Check for collision with the item
+    const itemLeft = item.getBoundingClientRect().left;
+    const itemRight = item.getBoundingClientRect().right;
+    const itemTop = item.getBoundingClientRect().top;
+    const itemBottom = item.getBoundingClientRect().bottom;
+
+    if (
+      birdLeft < itemRight &&
+      birdRight > itemLeft &&
+      birdTop < itemBottom &&
+      birdBottom > itemTop
+    ) {
+      // Bird collided with the item
+      item.style.display = 'none'; // Hide the item after it's collected
+      score += 1;
+      itenscoletados += 1
+
+      const scorediv = document.querySelector('.score p');
+      scorediv.textContent = `Maconhas: ${itenscoletados}`;
+
+
+    }
+  }
+
+  function moveItem() {
+    itemPosition -= 6; // Adjust the speed of the item here
+    item.style.left = itemPosition + 'px';
+
+    if (itemPosition < -40) {
+      item.style.display = 'none';
+      createItem()
+    }
+  }
+
+  function gameLoop() {
+
+
+    if (isGameRunning) {
+      birdPosition += 2;
+      bird.style.top = birdPosition + 'px';
+
+      pipePosition -= 4;
+      pipes.forEach(pipe => {
+        pipe.style.left = pipePosition + 'px';
+      });
+
+      moveItem(); // Move the item
+
+      checkCollision();
+
+      if (pipePosition < -60) {
+        createPipe();
+        score += 1;
+      }
+
+
+
+      if (birdPosition > 560 || birdPosition < 0) {
+        // Bird hit the ground or ceiling
+        alert('Game Over! Score: ' + score);
+        resetGame();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  function resetGame() {
+    birdPosition = 250;
+    bird.style.top = birdPosition + 'px';
+    pipePosition = 400;
+    score = 0;
+    isGameRunning = false;
+    startButton.style.display = 'block';
+    titulo.style.display = 'block';
+  }
+
+  function startGame() {
+    
+
+
+
+    titulo.style.display = 'none';
+
+
+    isGameRunning = true;
+    startButton.style.display = 'none';
+    gameLoop();
+  }
+
+  startButton.addEventListener('click', startGame);
+
+  document.addEventListener('keydown', (event) => {
+    if (isGameRunning && event.code === 'Space') {
+      jump();
+    }
+  });
+
+  // Function to detect if the device is a mobile device
+  function isMobileDevice() {
+    return typeof window.orientation !== 'undefined' || navigator.userAgent.indexOf('IEMobile') !== -1;
+  }
+
+  // Adding touch event for mobile devices
+  if (isMobileDevice()) {
+    gameContainer.addEventListener('touchstart', () => {
+      if (isGameRunning) {
+        jump();
+      } else {
+        startGame();
+      }
+    });
+  } else {
+    // Adding click event for non-mobile devices
+    gameContainer.addEventListener('click', () => {
+      if (isGameRunning) {
+        jump();
+      } else {
+        startGame();
+      }
+    });
+  }
+
+  createPipe();
+  createItem(); // Create the item at the start
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
